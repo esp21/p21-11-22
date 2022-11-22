@@ -1,0 +1,221 @@
+<odoo>
+  <data>
+    <record id="view_helpdesk_form_inherit" model="ir.ui.view">
+      <field name="name">helpdeskinherit</field>
+      <field name="model">helpdesk.ticket</field>
+      <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+      <field name="arch" type="xml">
+        <button name="assign_ticket_to_self" position="after">
+          <button name="unassign_ticket_to_self" string="Reject ticket" type="object" class="oe_highlight" groups="helpdesk.group_helpdesk_user" attrs="{'invisible': [('is_self_assigned', '=', False)]}"/>
+        </button>
+        <button name="unassign_ticket_to_self" position="after">
+          <button name="create_problem_ticket" string="Create Problem Ticket" type="object" class="oe_highlight" groups="helpdesk.group_helpdesk_user" attrs="{'invisible': [('stage_id', '!=', 3)]}"/>
+        </button>    
+        <!-- <field name="priority" position="replace">
+          <field name="x_p21_priority" widget="priority"/>
+        </field> -->
+        <field name="partner_id" position="after">
+          <field name="x_status"/>
+        </field>
+        <field name="email_cc" position="after">
+          <field name="x_customer_reference"/>
+        </field>
+        <field name="x_customer_reference" position="after">
+          <field name="x_tac_id"/>
+        </field>
+        <field name="user_id" position="after">
+          <field name="x_extra_engineers" widget="many2many_tags"/>
+          <field name="x_categories" widget="many2many_tags"/>
+        </field>
+        <field name="priority" position="after">
+          <field name="x_p21_priority_mapping"/>
+        </field>
+        <field name="tag_ids" position="after">
+          <field name="x_active_time_human_readable"/>
+        </field>
+        <xpath expr="sheet[1]" position="after">
+          <sheet>
+            <h2>Problem ticket</h2>
+            <group>
+              <group>
+                <field name="x_is_problem_ticket"/>
+              </group>
+              <group>
+                <field name="x_problem_ticket_source"/>
+              </group>
+            </group>
+          </sheet>
+          <sheet>
+            <h2>Timesheets</h2>
+            <group>
+              <group>
+                <field name="x_project"/>
+                <field name="x_task"/>
+                <p>*Leave the Task blank to automatically create a Task with the Ticket ID</p>
+              </group>
+              <group>
+                <field name="x_create_timesheet"/>
+              </group>
+            </group>
+          </sheet>
+          <sheet>
+            <h2>Initial response</h2>
+            <group>
+              <group>
+                <field name="x_initial_response_complete"/>
+              </group>
+              <group>
+                <field name="x_initial_response_within_SLA"/>
+                <field name="x_initial_response_notes"/>
+              </group>
+            </group>
+          </sheet>
+          <sheet>
+            <h2>Change Request</h2>
+            <group>
+              <group>
+                <field name="x_is_change_request"/>
+                <field name="x_change_request_approval"/>
+              </group>
+              <group>
+                <field name="x_is_change_request_complexity"/>
+              </group>
+            </group>
+          </sheet>
+          <sheet>
+            <h2>PlanNet21 Internal Issues</h2>
+            <group>
+              <group>
+                <field name="x_p21_internal_issue"/>
+                <field name="x_p21_internal_date_detected"/>
+                <field name="x_p21_internal_rca_provided"/>
+                <field name="x_p21_internal_sec_team_closed"/>
+              </group>
+              <group>
+                <field name="x_p21_internal_gdpr_applies"/>
+                <field name="x_p21_internal_dpc_notified_72hrs"/>
+                <field name="x_p21_internal_security_incident"/>
+              </group>
+            </group>
+          </sheet>
+          <sheet>
+            <h2>Closing</h2>
+            <group>
+              <group>
+                <field name="x_closing_reason"/>
+                <field name="x_closing_result_code" widget="many2many_tags"/>
+              </group>
+              <group>
+                <field name="x_closing_work_ended"/>
+                <field name="x_closing_closed_by"/>
+              </group>
+              <field name="x_closing_closing_notes" placeholder="Closing Notes..."/>
+            </group>
+          </sheet>
+        </xpath>
+      </field>
+    </record>
+
+
+    <!-- <record id="view_p21helpdesk_notification_config" model="ir.ui.view">
+      <field name="name">notifications_config</field>
+      <field name="model">p21helpdesk.helpdesk_config</field>
+      <field name="arch" type="xml">
+        <group>
+          <field name="support_manager_email"/>
+          <field name="engineering_manager_email"/>
+        </group>
+        <group>
+          <field name="cto_email"/>
+          <field name="ceo_email"/>
+        </group>
+      </field>
+    </record> -->
+
+    <!-- explicit list view definition -->
+<!--
+    <record model="ir.ui.view" id="p21helpdesk.list">
+      <field name="name">p21helpdesk list</field>
+      <field name="model">p21helpdesk.p21helpdesk</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+-->
+
+    <!-- actions opening views on models -->
+<!--
+    <record model="ir.actions.act_window" id="p21helpdesk.action_window">
+      <field name="name">p21helpdesk window</field>
+      <field name="res_model">p21helpdesk.p21helpdesk</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+-->
+
+    <!-- server action to the one above -->
+<!--
+    <record model="ir.actions.server" id="p21helpdesk.action_server">
+      <field name="name">p21helpdesk server</field>
+      <field name="model_id" ref="model_p21helpdesk_p21helpdesk"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": model._name,
+        }
+      </field>
+    </record>
+-->
+
+    <!-- Top menu item -->
+<!--
+    <menuitem name="p21helpdesk" id="p21helpdesk.menu_root"/>
+-->
+    <!-- menu categories -->
+<!--
+    <menuitem name="Menu 1" id="p21helpdesk.menu_1" parent="p21helpdesk.menu_root"/>
+    <menuitem name="Menu 2" id="p21helpdesk.menu_2" parent="p21helpdesk.menu_root"/>
+-->
+    <!-- actions -->
+<!--
+    <menuitem name="List" id="p21helpdesk.menu_1_list" parent="p21helpdesk.menu_1"
+              action="p21helpdesk.action_window"/>
+    <menuitem name="Server to list" id="p21helpdesk" parent="p21helpdesk.menu_2"
+              action="p21helpdesk.action_server"/>
+-->
+
+	  <!--ACTIONS-->
+	  <!--The action has to be witten before the menus that call it-->
+    <record id="action_helpdesk_notifications_config" model="ir.actions.act_window">
+      <field name="name">Notifications Config</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">p21helpdesk.helpdesk_config</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+        <p>Configure the email addresses for the ticket escalation notifications</p>
+      </field>
+    </record>
+
+    <!-- Tree view for the config  -->
+    <record model="ir.ui.view" id="p21helpdesk.helpdesk_config_list">
+      <field name="name">p21helpdesk config list</field>
+      <field name="model">p21helpdesk.helpdesk_config</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="support_manager_email"/>
+          <field name="engineering_manager_email"/>
+          <field name="cto_email"/>
+          <field name="ceo_email"/>
+        </tree>
+      </field>
+    </record>
+
+    <menuitem id="notifications_config" name="Notifications" parent="helpdesk.helpdesk_menu_config" action="action_helpdesk_notifications_config" groups="base.group_user" sequence='50'/>    
+
+  </data>
+</odoo>

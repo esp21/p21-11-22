@@ -1,0 +1,268 @@
+<odoo>
+  <data>
+
+    <!-- Add contact field to quick-create opportunity form-->
+    <record model="ir.ui.view" id="p21opp_opper_quick_form_inherit">
+      <field name="name">p21opp.oppertunity.quickform</field>
+      <field name="model">crm.lead</field>
+      <field name="inherit_id" ref="crm.quick_create_opportunity_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="before">
+            <field name="contact_id"  />
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Add quarterly reports to Opportunity form -->
+    <record model="ir.ui.view" id="p21opp_opper_form_inherit">
+      <field name="name">p21opp.oppertunity.form</field>
+      <field name="model">crm.lead</field>
+      <field name="inherit_id" ref="crm.crm_lead_view_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//page[@name='lead']" position="after">
+          <page name="forecast" string="Forecast Report" >
+              <field name="qtr_reports" mode="tree">
+                <tree editable="bottom">
+                  <field name="name"  />
+                  <field name="include"  />
+                  <field name="invoice"  />
+                  <field name="margin"   />
+                  <field name="company_id" groups="base.group_multi_company" />
+                  <field name="oppor_id" invisible="1" />
+                </tree>
+              </field>
+          </page>          
+        </xpath>        
+        <!-- Remove 'at' after opportunity value -->
+        <xpath expr="//h2/div[1]/div" position="replace">
+          <div class="o_row">
+              <field name="company_currency" invisible="1"/>
+              <field name="expected_revenue" class="oe_inline" widget="monetary" options="{'currency_field': 'company_currency'}"/>
+          </div>
+        </xpath>
+        <!-- Remove probability field -->
+        <xpath expr="//h2/div[4]" position="replace">
+          <div class="col" invisible="1">
+              <div class="oe_edit_only d-flex align-items-center">
+                  <label for="probability"/>
+                  <button class="btn btn-link" name="action_set_automated_probability" type="object" attrs="{'invisible': [('is_automated_probability', '=', True)]}">
+                      <i class="fa fa-gear" role="img" title="Switch to automatic probability" aria-label="Switch to automatic probability"/>
+                  </button>
+                  <small class="oe_grey h6 mb0" attrs="{'invisible': [('is_automated_probability', '=', True)]}">
+                      <field class="mb0" name="automated_probability" force_save="1"/> %
+                  </small>
+              </div>
+              <div id="probability" class="o_row d-flex">
+                  <field name="is_automated_probability" invisible="1"/>
+                  <field name="probability" widget="float" class="oe_inline"/>
+                  <span class="oe_grey"> %</span>
+              </div>
+          </div>
+        </xpath>
+        <!-- Add Cust PO field-->
+        <xpath expr="//field[@name='priority']" position="after">
+            <field name="po_number"  />
+        </xpath>
+        <!-- Add Contact field-->
+        <xpath expr="//field[@name='phone_state']" position="after">
+            <field name="contact_id"  />
+        </xpath>
+        <!-- Move sales team off front page -->
+        <xpath expr="//field[@name='team_id']" position="attributes">
+            <attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="//field[@name='description']" position="after">
+            <label for="team_id" string="Sales Team"/>
+            <field name="team_id" widget="selection" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"/>
+        </xpath>
+ 
+      </field>
+    </record>  
+
+    <!-- Pivot view on opportunities (pipeline report) -->
+    <!-- NB this replaces the standard view completely -->
+    <record model="ir.ui.view" id="crm.crm_lead_view_pivot">
+      <field name="name">crm.lead.view.pivot</field>
+      <field name="model">crm.lead</field> 
+      <field name="arch" type="xml">          
+        <pivot string="Pipeline Analysis">
+
+            <field name="date_deadline" interval="month" type="row"/>
+            <field name="user_id" type="row"/>
+            <field name="priority" type="col"/>
+            <field name="expected_revenue" type="measure"/> 
+        </pivot>     
+      </field>
+    </record>
+
+    <!-- Search filters on opportunities -->
+    <!-- NB this replaces the standard view completely -->
+    <record model="ir.ui.view" id="crm.view_crm_case_opportunities_filter">
+      <field name="name">crm.lead.search.opportunity</field>
+      <field name="model">crm.lead</field> 
+      <field name="arch" type="xml">       
+        <search string="Search Opportunities">        
+        <field name="name" string="Opportunity" filter_domain="[                         '|', '|', '|', '|',                         ('partner_id', 'ilike', self),                         ('partner_name', 'ilike', self),                         ('email_from', 'ilike', self),                         ('name', 'ilike', self),                         ('contact_name', 'ilike', self)]"/>
+        <field name="partner_id" operator="child_of" string="Customer" filter_domain="[                         '|', '|', '|',                         ('partner_id', 'ilike', self),                         ('partner_name', 'ilike', self),                         ('email_from', 'ilike', self),                         ('contact_name', 'ilike', self)]"/>
+        <field name="tag_ids" string="Tag" filter_domain="[('tag_ids', 'ilike', self)]"/>
+        <field name="user_id"/>
+        <field name="team_id"/>
+        <field name="stage_id" domain="[]"/>
+        <field name="country_id"/>
+        <field name="city"/>
+        <separator/>
+        <filter string="My Pipeline" name="assigned_to_me" domain="[('user_id', '=', uid)]" help="Opportunities that are assigned to me"/>
+        <filter string="Unassigned" name="unassigned" domain="[('user_id', '=', False)]" help="No salesperson"/>
+        <filter string="Open Opportunities" name="open_opportunities" domain="[('probability', '&lt;', 100), ('type', '=', 'opportunity')]" help="Open Opportunities"/>
+        <separator/>
+        <filter string="High Confidence" name="high_confidence" domain="[('priority', '=', 3)]"/>
+        <filter string="Medium Confidence" name="med_confidence" domain="[('priority', '=', 2)]"/>
+        <filter string="Low Confidence" name="low_confidence" domain="[('priority', '=', 1)]"/>
+        <filter string="Very Low Confidence" name="vlow_confidence" domain="[('priority', '=', 0)]"/>
+       <separator/>
+        <filter string="Unread Messages" name="message_needaction" domain="[('message_needaction', '=', True)]"/>
+        <separator/>
+        <filter string="Creation Date" name="creation_date" date="create_date"/>
+        <filter string="Est Close Date" name="deadline_date" date="date_deadline"/>
+        <filter string="Actual Closed Date" name="close_date" date="date_closed"/>
+        <separator/>
+        <filter string="Won" name="won" domain="['&amp;', ('active', '=', True), ('stage_id.is_won', '=', True)]"/>
+        <filter string="Lost" name="lost" domain="['&amp;', ('active', '=', False), ('probability', '=', 0)]"/>
+        <separator/>
+        <filter invisible="1" string="Late Activities" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" help="Show all opportunities for which the next action date is before today"/>
+        <filter invisible="1" string="Today Activities" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+        <filter invisible="1" string="Future Activities" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+        <separator/>
+        <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+        <group expand="0" string="Group By" colspan="16">
+            <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
+            <filter string="Confidence" name="confidence" context="{'group_by':'priority'}"/>
+            <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
+            <filter name="stage" string="Stage" context="{'group_by':'stage_id'}"/>
+            <filter name="city" string="City" context="{'group_by': 'city'}"/>
+            <filter string="Country" name="country" context="{'group_by':'country_id'}"/>
+            <filter string="Lost Reason" name="lostreason" context="{'group_by':'lost_reason'}"/>
+            <filter string="Company" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+            <filter string="Campaign" name="compaign" domain="[]" context="{'group_by':'campaign_id'}"/>
+            <filter string="Medium" name="medium" domain="[]" context="{'group_by':'medium_id'}"/>
+            <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
+            <separator orientation="vertical"/>
+            <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+            <filter string="Conversion Date" name="date_conversion" context="{'group_by': 'date_conversion'}" groups="crm.group_use_lead"/>
+            <filter string="Expected Closing" name="date_deadline" context="{'group_by':'date_deadline'}"/>
+            <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
+        </group>
+    </search>
+
+      </field>   
+    </record>
+    
+    <!-- Pivot view on forecast report -->
+    <record model="ir.ui.view" id="view_pivot_oppor_report">
+      <field name="model">p21opportunity.reports</field>   
+      <field name="arch" type="xml">          
+        <pivot string="Forecast Report">
+            <field type="col" name="name" />
+            <field type="row" name="user_id" />
+            <field type="measure" name="invoice" />
+        </pivot>           
+      </field>
+    </record>
+    
+    <!-- Filters on forecast report -->
+    <record model="ir.ui.view" id="view_filter_oppor_report">
+      <field name="model">p21opportunity.reports</field>   
+      <field name="arch" type="xml">  
+        <search>
+            <field name="name"/>
+            <field name="user_id"/>
+            <field name="partner_id"/>
+            <field name="priority"/>
+            
+            <filter string="Included Reports" name="filter_include" domain="[('include','=',True)]"/>
+            <filter string="Excluded Reports" name="filter_exclude" domain="[('include','=',False)]"/>
+                       
+        </search>      
+      </field>
+    </record>
+    
+    <!-- Monthly reports list (drill-down from pivot) -->
+    <record model="ir.ui.view" id="view_oppor_mth_reports">
+      <field name="name">p21opportunity.list_mth_reports</field>
+      <field name="model">p21opportunity.reports</field>
+      <field name="arch" type="xml">
+        <tree default_order="name desc"        
+        decoration-muted="include == False" >
+          <field name="name"/>
+          <field name="user_id"/>
+          <field name="partner_id"/>
+          <field name="oppor_id"/>
+          <field name="priority"/>
+          <field name="invoice"/>
+          <field name="margin"/>
+          <field name="include"/>
+          <field name="company_id" groups="base.group_multi_company" />
+        </tree>
+      </field>
+    </record>
+
+    <!-- Monthly reports form (all read-only) -->
+    <record model="ir.ui.view" id="view_form_oppor_mth_rpt">
+        <field name="name">p21opportunity.reports_form</field>
+        <field name="model">p21opportunity.reports</field>
+        <field name="arch" type="xml">        
+          <form string="Forecast Report" create="false" delete="false" edit="false">
+              <sheet>
+                  <group name="outer_group">
+                    <group name="left_group">
+                      <field name="name"
+                       attrs="{'readonly': True}" />
+                      <field name="user_id"
+                       attrs="{'readonly': True}" />
+                      <field name="partner_id"
+                       attrs="{'readonly': True}" />
+                      <field name="oppor_id"
+                       attrs="{'readonly': True}" />       
+                      <field name="company_id" groups="base.group_multi_company" 
+                       attrs="{'readonly': True}" />                
+                    </group>
+                    <group name="right_group">
+                      <field name="priority"
+                       attrs="{'readonly': True}" />  
+                      <field name="invoice"
+                       attrs="{'readonly': True}" />  
+                      <field name="margin"
+                       attrs="{'readonly': True}" />  
+                      <field name="include"
+                       attrs="{'readonly': True}" />  
+                    </group>
+                  </group>
+              </sheet>
+          </form>
+        </field>
+      </record>
+
+
+    <!-- Action to open forecast report pivot view -->
+    <record model="ir.actions.act_window" id="p21opportunity.action_forecast">
+      <field name="name">Forecast Report</field>
+      <field name="res_model">p21opportunity.reports</field>
+      <field name="view_mode">pivot</field>
+
+      <!-- Default to showing just the 'included' items-->
+      <field name="context">{'search_default_filter_include': True} </field>
+    </record>
+
+    <!-- Allow all sales people to see reporting menu -->
+    <!-- We are overriding the existing menu here -->
+    <menuitem name="Reporting" id="crm.crm_menu_report" sequence="20"
+      groups="sales_team.group_sale_manager,sales_team.group_sale_salesman,sales_team.group_sale_salesman_all_leads"
+      parent="crm.crm_menu_root"
+    />
+
+    <menuitem name="Forecast Rpt" id="p21opportunity.reports_forecast_menu" 
+              parent="crm.crm_menu_report"
+              action="p21opportunity.action_forecast" />
+
+  </data>
+</odoo>

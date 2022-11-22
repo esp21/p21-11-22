@@ -1,0 +1,179 @@
+<odoo>
+  <data>
+
+    <!-- Add P21 change req fields to approval categories form -->
+    <record model="ir.ui.view" id="p21approval_category_form_inherit">
+      <field name="name">p21approval.approval.category.form</field>
+      <field name="model">approval.category</field>
+      <field name="inherit_id" ref="approvals.approval_category_view_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//group[@name='option_settings']" position="inside">
+          <field name="has_tech_affected" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_biz_impact" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_implement_plan" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_test_plan" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_rollback_plan" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_comm_plan" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_implement_by" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_notify_list" widget="radio" options="{'horizontal': true}"/>
+          <field name="has_implement_date" widget="radio" options="{'horizontal': true}"/>
+        </xpath>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="p21approval_request_form_inherit">
+      <field name="name">p21approval.approval.request.form</field>
+      <field name="model">approval.request</field>
+      <field name="inherit_id" ref="approvals.approval_request_view_form" />
+      <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='has_date']" position="before">
+          <field name="has_tech_affected" invisible="1"/>
+          <field name="has_biz_impact" invisible="1"/>
+          <field name="has_implement_plan" invisible="1"/>
+          <field name="has_test_plan" invisible="1"/>
+          <field name="has_rollback_plan" invisible="1"/>
+          <field name="has_comm_plan" invisible="1"/>
+          <field name="has_implement_by" invisible="1"/>
+          <field name="has_notify_list" invisible="1"/>
+          <field name="has_implement_date" invisible="1"/>
+        </xpath>
+
+        <xpath expr="//field[@name='category_id']" position="after">
+
+          <field name="tech_affected" widget="many2many_tags" 
+          attrs="{'invisible':[('has_tech_affected','==','no')], 
+          'required': [('has_tech_affected','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="biz_impact" attrs="{'invisible':[('has_biz_impact','==','no')], 
+          'required': [('has_biz_impact','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="implement_by" attrs="{'invisible':[('has_implement_by','==','no')], 
+          'required': [('has_implement_by','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="implement_date" attrs="{'invisible':[('has_implement_date','==','no')], 
+          'required': [('has_implement_date','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="notify_list" widget="many2many" 
+          attrs="{'invisible':[('has_notify_list','==','no')], 
+          'required': [('has_notify_list','==','required')], 
+          'readonly': [('request_status','not in',('new'))]}"
+          context="{'tree_view_ref':'p21approval.p21approval_user_list_view'}"/>
+          
+        </xpath>
+
+        <xpath expr="//field[@name='quantity']" position="before">
+
+          <field name="implement_plan" attrs="{'invisible':[('has_implement_plan','==','no')], 
+          'required': [('has_implement_plan','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="test_plan" attrs="{'invisible':[('has_test_plan','==','no')], 
+          'required': [('has_test_plan','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="rollback_plan" attrs="{'invisible':[('has_rollback_plan','==','no')], 
+          'required': [('has_rollback_plan','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+          <field name="comm_plan" attrs="{'invisible':[('has_comm_plan','==','no')], 
+          'required': [('has_comm_plan','==','required')], 
+          'readonly': [('request_status','not in',('new', 'pending'))]}"/>
+          
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Add gantt view to approvals -->
+    <record id="p21_approval_view_gantt" model="ir.ui.view">
+      <field name="name">p21approval.approval.request.gantt</field>
+      <field name="model">p21approval.calendar</field>
+      <field name="arch" type="xml">     
+        <gantt string="Bookings"
+        date_start="date_start"
+        date_stop = "date_end"
+        color="category_id"
+        create="false"
+        plan="false"
+        edit="false"
+        delete="false"
+        default_group_by="category_id" 
+        decoration-danger="request_status in ['refused', 'cancel']"
+        decoration-success="request_status in ['approved', 'new']"
+        decoration-info="request_status in ['pending']" >
+          <field name="name" />
+          <field name="request_owner_id" invisible="1" />
+          <field name="request_status" invisible="1" />
+          <templates>
+              <div t-name="gantt-popover" class="container-fluid p-0">
+                  <div class="row no-gutters">
+                      <div class="col">
+                          <ul class="p-0 mb-0 list-unstyled d-flex flex-row">
+                              <li class="d-flex flex-column pr-2">
+                                  <strong>Start:</strong>
+                                  <strong>End:</strong>
+                                  <strong>Requester:</strong>
+                              </li>
+                              <li class="d-flex flex-column">
+                                  <span t-esc="date_start"/>
+                                  <span t-esc="date_end"/>
+                                  <span t-esc="request_owner_id[1]"/>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </templates>          
+        </gantt>
+      </field> 
+    </record>
+
+    <!-- Window action to go direct to Gantt -->
+    <record model="ir.actions.act_window" id="p21approval.gantt_view">
+      <field name="name">Approval Calendar</field>
+      <field name="res_model">p21approval.calendar</field>
+      <field name="view_mode">gantt</field>
+      <field name="domain">[('request_status','in',['pending','approved','new'])]</field>
+    </record>
+
+    <!-- Add menu to Gantt under My Approvals menu -->
+    <menuitem name="Calendar" id="p21approval.menu_gantt" 
+              parent="approvals.approvals_approval_menu"
+              sequence="30"
+              action="p21approval.gantt_view" />
+
+    <!-- Simplified list of users for lookup -->
+    <record model="ir.ui.view" id="p21approval_user_list_view">
+      <field name="name">p21approval.user.list</field>
+      <field name="model">res.users</field>
+      <!-- Avoid any clash with built-in views of default priority 16 -->
+      <field name="priority">25</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="company_id" />
+        </tree>
+      </field>
+    </record>
+
+    <!-- Show filter for displaying archived records -->
+    <record model="ir.ui.view" id="p21approval_request_search">
+      <field name="name">p21approval.approval.request.search</field>
+      <field name="model">approval.request</field>
+      <field name="inherit_id" ref="approvals.approval_search_view_search" />
+      <field name="arch" type="xml">
+        <xpath expr="//filter[@name='filter_approvals_to_review']" position="after">
+          <separator/>
+          <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+          <separator/>          
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</odoo>
+

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_p21helpdesk_category,p21helpdesk.category,model_p21helpdesk_category,base.group_user,1,1,1,1
+access_p21helpdesk_closing_result_code,p21helpdesk.closing_result_code,model_p21helpdesk_closing_result_code,base.group_user,1,1,1,1
+access_p21helpdesk_helpdesk_config_usr,p21helpdesk.helpdesk_config_usr,model_p21helpdesk_helpdesk_config,p21helpdesk.group_user,1,0,0,0
+access_p21helpdesk_helpdesk_config_mgr,p21helpdesk.helpdesk_config_mgr,model_p21helpdesk_helpdesk_config,p21helpdesk.group_manager,1,1,0,0
+

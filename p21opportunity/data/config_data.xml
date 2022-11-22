@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+<!-- 
+    <data>
+        <record id="p21opps_qtr_01" model="p21opportunity.quarters">
+            <field name="name">2020 Q1</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="p21opps_qtr_02" model="p21opportunity.quarters">
+            <field name="name">2020 Q2</field>
+        </record>
+    </data> 
+-->
+
+
+</odoo>

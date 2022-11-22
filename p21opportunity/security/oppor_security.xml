@@ -1,0 +1,54 @@
+<odoo>
+
+    <!-- This rule prevents basic users seeing other users sales forecast -->
+    <record id="p21oppfore_own_recs_only_rule" model="ir.rule">
+        <field name="name">Users cant see other user's forecasts</field>
+        <field name="model_id" ref="p21opportunity.model_p21opportunity_reports"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="True" />
+        <field name="domain_force">[('user_id','=',user.id)]</field>
+        <field name="active" eval="True" />
+    </record>
+    
+    <!-- Senior sales people can see all forecasts -->
+	<record id="p21oppfore_see_all_recs" model="ir.rule">
+        <field name="name">Senior sales team can see all forecasts</field>
+        <field name="model_id" ref="p21opportunity.model_p21opportunity_reports"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="True" />
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="active" eval="True" />
+    </record>
+    
+    <!-- This rule allows admin users see all sales forecasts -->
+    <record id="p21oppfore_mgr_see_all_recs" model="ir.rule">
+        <field name="name">Admin users can see all forecasts</field>
+        <field name="model_id" ref="p21opportunity.model_p21opportunity_reports"/>
+        <field name="groups" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="perm_read" eval="True" />
+        <field name="perm_create" eval="True" />
+        <field name="perm_write" eval="True" />
+        <field name="perm_unlink" eval="True" />
+        <field name="domain_force">[(1,'=',1)]</field> <!-- Always true -->
+        <field name="active" eval="True" />
+    </record>
+    
+
+	<!--Multicompany enforce-->
+	<record model="ir.rule" id="multicompany_p21opportunity_reports_rule">
+    		<field name="name">Multicompany P21 Opportunity Reports</field>
+    		<field name="model_id" ref="p21opportunity.model_p21opportunity_reports"/>
+    		<field name="global" eval="True"/>
+    		<field name="domain_force">['|',
+ 						('company_id','=',False),
+ 						('company_id','in',company_ids)]
+		</field>
+	</record>
+    
+</odoo>

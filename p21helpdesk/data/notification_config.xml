@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<odoo>
+    <record id="notification_config_record" model="p21helpdesk.helpdesk_config">
+        <field name="support_manager_email">support_manager_email@plannet21.ie</field>
+        <field name="engineering_manager_email">engineering_manager_email@plannet21.ie</field>
+        <field name="cto_email">cto_email@plannet21.ie</field>
+        <field name="ceo_email">ceo_email@plannet21.ie</field>
+    </record>
+
+    <record id="customer_stopped_sla" model="helpdesk.stage">
+        <field name="name">Customer Stopped</field>
+        <field name="team_ids" eval="[(4, 1)]"></field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="account_manager_approval_pending_sla" model="helpdesk.stage">
+        <field name="name">AM Approval Pending</field>
+        <field name="team_ids" eval="[(4, 1)]"></field>
+        <field name="sequence">11</field>
+    </record>
+
+    <!-- <record id="account_manager_approved" model="helpdesk.stage">
+        <field name="name">AM Approved</field>
+        <field name="team_ids" eval="[(4, 1)]"></field>
+        <field name="sequence">12</field>
+    </record> -->
+</odoo>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_contact_form_inherit" model="ir.ui.view">
+            <field name="name">partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+
+		<!--Move salesperson to first page -->
+		<xpath expr="//field[@name='vat']" position="before">
+		    	<field name="user_id"/>
+		</xpath>
+
+		<xpath expr="//field[@name='ignore_duplicates']" position="after">
+		    	<field name="no_marketing"/>
+		</xpath>
+
+		<xpath expr="//field[@name='industry_id']" position="after">
+		    	<field name="credit_ctrlr"/>
+		</xpath>
+
+		<!--Top shortcuts -->
+<!--		<xpath expr="//div[@name='button_box']" position="replace">
+			<div class="oe_button_box" name="button_box" modifiers="{}">
+				<button class="oe_stat_button o_res_partner_tip_opp" type="object" name="action_view_opportunity" icon="fa-star" domain="{'default_partner_id': active_id, 'default_stage_id':'New'}" modifiers="{}" options="{}">
+					<field string="Opportunities" name="opportunity_count" widget="statinfo" modifiers="{'readonly':true}" id="opportunity_count"/>
+				</button>
+				<button class="oe_stat_button o_res_partner_tip_opp" type="object" name="%(crm.crm_lead_action_team_overdue_opportunity)d" icon="fa-star" domain="{'default_partner_id': active_id, 'default_stage_id':'New'}" modifiers="{}" options="{}">
+					<field string="Opportunities" name="opportunity_count" widget="statinfo" modifiers="{'readonly':true}" id="opportunity_count"/>
+				</button>
+			</div>
+		</xpath>
+
+-->
+		
+		<xpath expr="//button[@name='action_view_opportunity']" position="attributes">
+			<attribute name="context">{'search_default_partner_id':active_id, 'search_default_stage_id':[1,'OR',2] }</attribute>
+		</xpath>
+
+		<!--Hide VAT and Tags from first page -->
+		<xpath expr="//field[@name='vat']" position="replace">
+		</xpath>
+
+		<xpath expr="//field[@name='category_id']" position="replace">
+		</xpath>
+
+		<!--Hide fields for Person (Not Company)-->
+		<xpath expr="//field[@name='title']" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</xpath>
+
+		<xpath expr="//field[@name='website']" position="attributes">
+			<attribute name="attrs">{'invisible': [('is_company', '=', False)]}</attribute>
+		</xpath>
+
+		<!--Hide fields for Company-->
+
+		<xpath expr="//field[@name='mobile']" position="attributes">
+			<attribute name="attrs">{'invisible': [('is_company', '=', True)]}</attribute>
+		</xpath>
+
+		<xpath expr="//label[@for='mobile']" position="attributes">
+			<attribute name="attrs">{'invisible': [('is_company', '=', True)]}</attribute>
+		</xpath>
+		
+		<!--
+		<xpath expr="//field[@name='email']" position="attributes">
+			<attribute name="attrs">{'invisible': [('is_company', '=', True)]}</attribute>
+		</xpath>
+
+		<xpath expr="//label[@for='email']" position="attributes">
+			<attribute name="attrs">{'invisible': [('is_company', '=', True)]}</attribute>
+		</xpath>
+		-->
+
+		<!--Move fields to Sales & Purchases Tab -->
+		<xpath expr="//page[2]//group[1]" position="after">
+		<group>
+		    	<group string="Last Activity" name="last_activity">
+			    	<field name="status"/>
+				<field name="last_activity"/>
+			    	<field name="last_activity_source"/>
+			</group>
+			<group string="VAT">
+				<field name="vat"/>
+			</group>
+		</group>
+		</xpath>
+
+		<!--Add new tab for extra fields-->
+		<xpath expr="//page[4]" position="after">
+			<page string="Account Profile">
+				<group string="Additional info" name="tags">
+					<field name="category_id" widget="many2many_tags"/>
+				</group>
+			</page>
+		</xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

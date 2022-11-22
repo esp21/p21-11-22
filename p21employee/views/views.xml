@@ -1,0 +1,104 @@
+<odoo>
+  <data>
+    <!-- Add New planning calendar sync field to form -->
+    <record model="ir.ui.view" id="p21employee_employee_form_inherit">
+      <field name="name">p21employee.employee.form</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='department_id']" position="after">
+          <field name="office_name" />
+        </xpath>
+        <xpath expr="//field[@name='job_id']" position="after">
+          <field name="start_date" />
+          <field name="seniority" />
+          <field name="ms_proj_eng_code" />
+          <field name="webex_id" />
+          <field name="webex_role" />
+        </xpath>
+        <!-- Hide tabs from non-admins -->
+        <xpath expr="//page[@name='personal_information']" position="attributes">
+          <attribute name="groups">hr.group_hr_manager</attribute>
+        </xpath>
+        <xpath expr="//page[@name='public']" position="attributes">
+          <attribute name="groups">hr.group_hr_manager</attribute>
+        </xpath>
+        <xpath expr="//page[@name='hr_settings']" position="attributes">
+          <attribute name="groups">hr.group_hr_manager</attribute>
+        </xpath>
+        <!-- Prevent non-admins from editing remaining fields -->
+        <field name="name" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                              
+        <field name="mobile_phone" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="work_phone" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="work_email" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="company_id" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="department_id" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="office_name" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="parent_id" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>                             
+        <field name="coach_id" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>              
+        <field name="job_title" position="attributes">
+            <attribute name="readonly">1</attribute>                   
+        </field>              
+      </field>
+    </record>
+
+    <!-- Make some fields editable by admins -->
+    <record model="ir.ui.view" id="p21employee_employee_form_inherit_mgr">
+      <field name="name">p21employee.employee.form.mgr</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_form" />
+      <field name="groups_id" eval="[(6, 0, [ref('hr.group_hr_manager') ])]" />                
+      <field name="arch" type="xml">                                   
+          <field name="name" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="mobile_phone" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="work_phone" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="work_email" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="company_id" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="department_id" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="office_name" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="parent_id" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="coach_id" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+          <field name="job_title" position="attributes">
+              <attribute name="readonly">0</attribute>                   
+          </field>                             
+      </field>
+    </record>
+ 
+  </data>
+</odoo>

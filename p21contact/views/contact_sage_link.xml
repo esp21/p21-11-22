@@ -1,0 +1,80 @@
+<odoo>
+  <data>
+
+    <!-- Add Sage iframe to contact page -->
+    <record model="ir.ui.view" id="p21cont_partner_form_inherit">
+      <field name="name">p21cont.partner.form</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//page[@name='internal_notes']" position="after">
+          <page name="sage" string="Finance History"  attrs="{'invisible': [('is_company','=', False)]}">
+              <iframe id="sageFrame" src="" width="100%" height="400"></iframe>
+          </page>
+        </xpath>   
+
+        <!-- JS that inserts the customer ID onto the Sage URL, and loads it into iframe --> 
+        <xpath expr="." position="inside">    
+          &lt;script&gt;
+              setTimeout(loadSageFrame, 3000);
+
+              function loadSageFrame() {
+                try {
+                  sageUrl = "https://crm-2011.plannet21.ie:488/crmorderheader.aspx?odooid=";
+                  accountID = document.getElementsByName("sage_link")[0].innerHTML;
+                  document.getElementById("sageFrame").src = sageUrl + accountID;
+                }
+                catch(e) {
+                  // Just fail silently
+                }
+              }
+          &lt;/script&gt;          
+        </xpath>
+
+        <!-- Cust ID field for link to Sage -->
+        <xpath expr="//field[@name='type']" position="before">
+          <field name="sage_link" attrs="{'invisible': [('is_company','=', False)]}" />
+        </xpath>   
+
+        <!-- Field to force saving, even if there's a duplicate -->
+        <xpath expr="//field[@name='category_id']" position="after">
+          <label for="ignore_duplicates" class="oe_edit_only"/>
+          <field name="ignore_duplicates" nolabel="1" class="oe_edit_only" />
+        </xpath>   
+
+        <!-- Show the parent company field for both people and companies -->
+        <xpath expr="//field[@name='parent_id']" position="replace">
+          <label for="parent_id" string="Parent Company" style="font-weight:bold;" />
+          <field name="parent_id" widget="res_partner_many2one" 
+          placeholder="Parent Company" domain="[('is_company', '=', True)]" 
+          context="{'default_is_company': True, 'show_vat': True}" />
+        </xpath>           
+
+      </field>
+    </record>  
+
+    <!-- Add 'My Customers' view to contacts list -->
+    <record model="ir.ui.view" id="view_filter_my_custs">
+      <field name="model">res.partner</field>   
+      <field name="inherit_id" ref="base.view_res_partner_filter"/>
+      <field name="arch" type="xml">  
+        <field name="name" position="after">
+            <filter string="My Customers" name="filter_my_custs" domain="[('user_id','=',uid)]"/>
+        </field>      
+      </field>
+    </record>
+    
+    <!-- Add sage cust id fields to customers tree view -->
+    <record model="ir.ui.view" id="p21cont_partner_tree_inherit">
+      <field name="name">p21contact.partner.tree</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_tree" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='email']" position="after">
+          <field name="sage_link" optional="show" />          
+        </xpath>
+      </field>
+    </record>    
+
+  </data>
+</odoo>
