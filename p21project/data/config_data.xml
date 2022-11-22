@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- User can't create config data, so we do it for him -->
+        <record id="p21project_status_a" model="p21project.projectstatus">
+            <field name="name">Pre-Planning NO Kit</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="p21project_status_b" model="p21project.projectstatus">
+            <field name="name">Pre-Planning With Kit</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="p21project_status_c" model="p21project.projectstatus">
+            <field name="name">Planned</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="p21project_status_d" model="p21project.projectstatus">
+            <field name="name">In Progress</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="p21project_status_e" model="p21project.projectstatus">
+            <field name="name">Suspended</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="p21project_status_f" model="p21project.projectstatus">
+            <field name="name">Closed</field>
+            <field name="sequence">6</field>
+        </record>
+        <record id="p21project_status_g" model="p21project.projectstatus">
+            <field name="name">Invoiced</field>
+            <field name="sequence">7</field>
+        </record>
+    </data>
+
+</odoo>
+

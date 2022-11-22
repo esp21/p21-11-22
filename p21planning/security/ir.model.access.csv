@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_p21plan_eng_editslot,P21 Plan Eng Edit Slot,model_p21planning_slot_engineer_edit,base.group_user,1,1,1,1
+access_p21plan_eng_deleteslot,P21 Plan Eng Delete Slot,model_p21planning_slot_engineer_delete,base.group_user,1,1,1,1
+access_p21plan_eng_createslot,P21 Plan Eng Create Slot,model_p21planning_slot_engineer_create,base.group_user,1,1,1,1

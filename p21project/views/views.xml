@@ -1,0 +1,278 @@
+<odoo>
+  <data>
+    <!-- Add new fields on main project form -->
+    <!-- Display the chatter -->
+    <record model="ir.ui.view" id="p21project_form_inherit">
+      <field name="name">p21project.project.form</field>
+      <field name="model">project.project</field>
+      <field name="inherit_id" ref="project.edit_project" />
+      <field name="arch" type="xml">
+        <xpath expr="//div[@class='oe_title']" position="after">
+          <div>
+            <group>
+              <group>
+                <field name="partner_id" string="Customer" widget="res_partner_many2one"/>
+                <field name="cust_po"/>
+                <field name="p21_so"/>
+                <field name="notify_budget"/>
+                <field name="notify_ids" widget="many2many_tags"/>
+                <field name="hold_inv_till"/>
+              </group>
+              <group>
+                <h2 style="padding-bottom: 30px">
+                  <label for="new_status" string="Status:"/>
+                  <field name="new_status" />                
+                </h2>
+                <field name="days_bought"/>
+                <field name="percent_used" widget="progressbar" />
+                <field name="days_pre_work"/>
+                <field name="days_work_std"/>
+                <field name="days_work_non_std"/>
+              </group>
+            </group>
+          </div>
+        </xpath>
+        <!-- Frame for order status data from Sage -->
+        <xpath expr="//page[@name='settings']" position="after">
+          <page name="sage" string="Order Status" >
+              <iframe id="sageFrame" src="" width="100%" height="400"></iframe>
+          </page>
+        </xpath>
+
+        <!-- JS that inserts the SO num onto the Sage URL, and loads it into iframe --> 
+        <xpath expr="." position="inside">    
+          &lt;script&gt;
+              setTimeout(loadSageFrame, 3000);
+
+              function loadSageFrame() {
+                try {              
+                    // Default the sage URL to P21
+                    sageUrl = "https://crm-2011.plannet21.ie:488/crmorderstatus.aspx?s=";
+                    companyName = document.getElementsByName("company_id")[0].innerHTML;
+                    if (companyName.includes('Agile')) {
+                      sageUrl = "https://crm-2011.plannet21.ie:499/crmorderstatus.aspx?s=";
+                    }
+                    soNum = document.getElementsByName("p21_so")[0].innerHTML;
+                    document.getElementById("sageFrame").src = sageUrl + soNum;
+                }
+                catch(e) {
+                  // Just fail silently
+                  console.log('loadSageFrame() error');
+                  console.log(e);
+                }
+              }
+          &lt;/script&gt;          
+        </xpath>
+
+        <xpath expr="//field[@name='partner_email']" position="after">
+          <field name="hours_per_day"/>
+          <field name="non_std_ratio"/>
+        </xpath>
+        <xpath expr="//field[@name='privacy_visibility']" position="before">          
+          <field name="default_notify"/>
+          <field name="notify_threshold"/>
+          <field name="ts_desc_reqd"/>
+          <field name="prevent_overbudget"/>
+          <field name="timesheet_warn_text"/>
+          <field name="budget_notify_sent" invisible="1"/>
+        </xpath>
+        <xpath expr="//field[@name='message_follower_ids']" position="after">
+          <field name="message_ids" widget="mail_thread"/>
+        </xpath>
+        <xpath expr="//field[@name='company_id']" position="replace">
+          <field name="company_id" />
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Show customer name & our SO on the create project form -->
+    <record model="ir.ui.view" id="p21project_form_simple_inherit">
+      <field name="name">p21project.project.simple.form</field>
+      <field name="model">project.project</field>
+      <field name="inherit_id" ref="project.project_project_view_form_simplified" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="partner_id" string="Customer" widget="res_partner_many2one"/>
+          <field name="p21_so"/>          
+          <field name="company_id" groups="base.group_multi_company"/>          
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Add our SO number & cust PO & direct link to project, to project kanban view -->
+    <record id="p21project_kanban_inherited" model="ir.ui.view">
+        <field name="name">p21project.project.timesheet.kanban</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="p21_so" />
+                <field name="cust_po" />
+                <field name="new_status" />
+            </field>
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by" add="new_status"/>
+            </xpath>            
+            <xpath expr="//div[hasclass('o_primary')]" position="replace">
+							<div class="o_primary">	
+                <span>
+									<t t-esc="record.name.value"/>
+								</span>
+								<span t-if="record.partner_id.value">
+									<strong>
+										<t t-esc="record.partner_id.value"/>
+									</strong>
+								</span>
+                <span t-if="record.p21_so.value">                                      
+                        <br /><strong>Our SO Num:</strong> <t t-esc="record.p21_so.value"/>
+                </span>
+                <span t-if="record.cust_po.value">                                      
+                        <br /><strong>Cust PO:</strong> <t t-esc="record.cust_po.value"/>
+                </span>
+              </div>
+            </xpath>
+            <xpath expr="//div[hasclass('o_project_kanban_boxes')]" position="inside">
+                <a class="o_project_kanban_box" type="open" >
+                    <div>
+                        <span class="o_label">Project</span>
+                    </div>
+                </a>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Show calendar URL on the user preferences form -->
+    <record model="ir.ui.view" id="p21project_form_res_users_pref_inherit">
+      <field name="name">p21project.project.res.users.pref</field>
+      <field name="model">res.users</field>
+      <field name="inherit_id" ref="base.view_users_form_simple_modif" />
+      <field name="arch" type="xml">
+        <xpath expr="//group[@name='auth']" position="before">
+          <group name="icalurl" string="External">
+            <field name="ical_url" />     
+          </group>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Add a 'stat' button to the top of the project-task form to show timesheet hours total -->
+    <!-- Also show exclude_proj_days on main task form -->
+    <record model="ir.ui.view" id="p21project_form_task_inherit">
+      <field name="name">p21project.project.task.form</field>
+      <field name="model">project.task</field>
+      <field name="inherit_id" ref="project.view_task_form2" />
+      <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button name="hr_timesheet.timesheet_action_task" type="action" 
+          class="oe_stat_button" icon="fa-tasks" >
+            <div class="o_field_widget o_stat_info">
+                <span class="o_stat_value">
+                    <field name="total_hours_spent" widget="statinfo" nolabel="1"/>
+                    Hrs
+                </span>
+                <span class="o_stat_text">Worked</span>
+            </div>            
+          </button>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="after">
+          <field name="exclude_proj_days"/>          
+        </xpath>
+      </field>
+    </record>    
+
+    <!-- Change the fields visible in the project tree view -->
+    <record model="ir.ui.view" id="p21project_tree_project_inherit">
+      <field name="name">p21project.project.tree</field>
+      <field name="model">project.project</field>
+      <field name="inherit_id" ref="project.view_project" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="after">
+          <field name="new_status" />          
+          <field name="p21_so" />
+          <field name="cust_po" />
+          <field name="days_bought" />
+          <field name="percent_used" widget="progressbar" />
+          <field name="days_work_std" />
+          <field name="days_work_non_std" />
+          <field name="days_pre_work" />
+        </xpath>
+      </field>
+    </record>    
+
+    <!-- Add status search to project listing & default to in-progress projects -->
+    <record model="ir.ui.view" id="p21project_search_project_inherit">
+      <field name="name">p21project.project.search</field>
+      <field name="model">project.project</field>
+      <field name="inherit_id" ref="project.view_project_project_filter" />
+      <field name="arch" type="xml">
+        <xpath expr="//filter[@name='my_projects']" position="after">
+          <separator />
+          <filter name="nokitstatus" string="Status: Pre-Planning NO Kit" domain="[('new_status.name','=','Pre-Planning NO Kit')]" />
+          <filter name="preplanstatus" string="Status: Pre-Planning With Kit" domain="[('new_status.name','=','Pre-Planning With Kit')]" />
+          <filter name="planstatus" string="Status: Planned" domain="[('new_status.name','=','Planned')]" />
+          <filter name="inprogressstatus" string="Status: In Progress" domain="[('new_status.name','=','In Progress')]" />
+          <filter name="suspendedstatus" string="Status: Suspended" domain="[('new_status.name','=','Suspended')]" />
+          <filter name="closedstatus" string="Status: Closed" domain="[('new_status.name','=','Closed')]" />
+          <filter name="invoicedstatus" string="Status: Invoiced" domain="[('new_status.name','=','Invoiced')]" />
+          <separator />
+          <filter name="my_projs" string="Projects I Manage" domain="[('user_id','=',uid)]" />
+        </xpath>
+      </field>
+    </record>    
+
+    <!-- Override the window action that opens the list of projects to set default filter to 'open' projects -->
+    <!-- Also allow list (tree) view, which is normally hidden -->
+    <record id="project.open_view_project_all" model="ir.actions.act_window">
+      <!-- Default search of in-progress, no longer relevant 
+      <field name="context">{'search_default_inprogress':'in-prog'}</field>
+      -->
+      <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <!-- Add a 'stat' button to the top of the customer form to show # of projects for cust -->
+    <record model="ir.ui.view" id="p21project_form_partner_inherit">
+      <field name="name">p21project.partner.form</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button name="project.open_view_project_all" type="action" 
+          context="{'search_default_partner_id':active_id}"
+          class="oe_stat_button" icon="fa-bar-chart" >
+            <div class="o_field_widget o_stat_info">
+                    <field string="Projects" name="project_count" widget="statinfo" />
+            </div>            
+          </button>
+        </xpath>
+      </field>
+    </record>    
+
+    <!-- Project statuses list view (admin only) -->
+    <record model="ir.ui.view" id="p21project_status_list_view">
+      <field name="name">p21project.statuslist</field>
+      <field name="model">p21project.projectstatus</field>
+      <field name="arch" type="xml">
+        <tree default_order="sequence" 
+        string="Project Statuses"
+        multi_edit="0" >
+          <field name="sequence" widget="handle"/>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- Action to open statuses list -->
+    <record model="ir.actions.act_window" id="p21project.statuses">
+      <field name="name">Project Statuses</field>
+      <field name="res_model">p21project.projectstatus</field>
+      <field name="view_mode">tree</field>
+    </record>
+
+    <!-- Only admins can see this project status list-->
+    <menuitem name="Project Statuses" id="p21project.menu_1_statuses" 
+              parent="project.menu_project_config"
+              action="p21project.statuses"
+              groups="base.group_system"/>
+
+</data>
+</odoo>

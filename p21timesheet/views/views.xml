@@ -1,0 +1,34 @@
+<odoo>
+  <data>
+    <!-- Add New non-standard hours field to list -->
+    <record model="ir.ui.view" id="p21account_atic_tree_inherit">
+      <field name="name">p21account.analytic.tree.hr_timesheet</field>
+      <field name="model">account.analytic.line</field>
+      <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='unit_amount']" position="after">
+          <field name="non_std_hours" sum="Total" widget="timesheet_uom" 
+            decoration-danger="non_std_hours &gt; 24"/>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Add New non-standard hours field to form -->
+    <record model="ir.ui.view" id="p21account_atic_form_inherit">
+      <field name="name">p21account.analytic.form.hr_timesheet</field>
+      <field name="model">account.analytic.line</field>
+      <field name="inherit_id" ref="timesheet_grid.timesheet_view_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//sheet/group/group[2]/div[1]" position="after">
+          <label for="non_std_hours" string="Of which, non-std"/>
+          <div class="o_row">
+              <field name="non_std_hours" widget="timesheet_uom" decoration-danger="non_std_hours &gt; 24"/>
+              Hours
+          </div>
+        </xpath>
+      </field>
+    </record>
+
+    
+  </data>
+</odoo>

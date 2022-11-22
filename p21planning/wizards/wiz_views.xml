@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Wizard form for engineer to change slot times -->
+    <record id="p21planning_slot_engineer_edit_form" model="ir.ui.view">
+        <field name="name">p21planning.slot.engineer.edit.form</field>
+        <field name="model">p21planning.slot.engineer.edit</field>
+        <field name="arch" type="xml">
+            <form string="Change Work Slot Times">
+                <sheet>
+                <group class="oe_title">                  
+                    <field name="change_reason" widget="text" />
+                    
+                    <field name="new_start_time" widget="daterange" 
+                    options="{&quot;related_end_date&quot;: &quot;new_end_time&quot;}" />
+                    
+                    <field name="new_end_time" widget="daterange" 
+                    options="{&quot;related_start_date&quot;: &quot;new_start_time&quot;}" />
+                </group>
+                </sheet>
+                <footer>
+                    <button type="object" name="button_save_edit" string="Save Change" class="btn-primary" />
+                    <button special="cancel" string="Cancel" class="btn-default" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard form for engineer to delete slot -->
+    <record id="p21planning_slot_engineer_delete_form" model="ir.ui.view">
+        <field name="name">p21planning.slot.engineer.delete.form</field>
+        <field name="model">p21planning.slot.engineer.delete</field>
+        <field name="arch" type="xml">
+            <form string="Delete Work Slot">
+                <sheet>
+                <group class="oe_title">                  
+                    <field name="change_reason" widget="text" />
+                </group>
+                </sheet>
+                <footer>
+                    <button type="object" name="button_delete" string="Confirm Delete!" class="btn-danger" />
+                    <button special="cancel" string="Cancel" class="btn-default" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard form for engineer to create a slot -->
+    <record id="p21planning_slot_engineer_create_form" model="ir.ui.view">
+        <field name="name">p21planning.slot.engineer.create.form</field>
+        <field name="model">p21planning.slot.engineer.create</field>
+        <field name="arch" type="xml">
+            <form string="Create Planning Slot">
+                <sheet>
+                <group class="oe_title">                  
+                    <field name="create_reason" widget="text" />
+                    <field name="project_id" />
+                    <field name="task_id" domain="[('project_id','=',project_id)]" />
+                    
+                    <field name="start_time" widget="daterange" 
+                    options="{&quot;related_end_date&quot;: &quot;end_time&quot;}" />
+                    
+                    <field name="end_time" widget="daterange" 
+                    options="{&quot;related_start_date&quot;: &quot;start_time&quot;}" />
+                </group>
+                </sheet>
+                <footer>
+                    <button type="object" name="button_create" string="Create Slot" class="btn-primary" />
+                    <button special="cancel" string="Cancel" class="btn-default" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+</odoo>

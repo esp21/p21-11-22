@@ -1,0 +1,50 @@
+<odoo>
+  <data>
+
+    <!-- Action to open the change-slot-times wizard -->
+    <act_window id="action_wizard_edit_slot"
+      name="Change Slot Times"
+      res_model="p21planning.slot.engineer.edit"
+      view_mode="form" target="new" />
+
+    <!-- Action to open the delete-slot wizard -->
+    <act_window id="action_wizard_delete_slot"
+      name="Delete Slot"
+      res_model="p21planning.slot.engineer.delete"
+      view_mode="form" target="new" />
+
+    <!-- Action to open the create-slot wizard -->
+    <act_window id="action_wizard_create_slot"
+      name="Create Planning Slot"
+      res_model="p21planning.slot.engineer.create"
+      view_mode="form" target="new" />
+
+    <!-- Add change & delete buttons to planning.slot form -->
+    <!-- Also add boolean field for auto-create of timesheet entry (only on create, not edit) -->
+    <record model="ir.ui.view" id="p21plan_slot_form_inherit">
+      <field name="name">p21plan.slot.form</field>
+      <field name="model">planning.slot</field>
+      <field name="inherit_id" ref="planning.planning_view_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//form//sheet" position="before">
+          <header>
+            <button type="action" name="%(action_wizard_edit_slot)d" 
+              string="Change Times" class="btn-primary" />
+            <button type="action" name="%(action_wizard_delete_slot)d" 
+              string="Delete Slot" class="btn-danger" />
+          </header>
+        </xpath>   
+        <xpath expr="//field[@name='allocated_percentage']" position="before">
+          <field name="create_timesheet" attrs="{'invisible': [('id', '!=', False)]}"/>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Add item to Planning Schedule menu to launch slot-create wizard -->    
+    <menuitem name="New Slot For Me" id="p21planning_slot_create_menu" 
+      parent="planning.planning_menu_schedule" sequence="40"
+      action="action_wizard_create_slot"
+      groups="planning.group_planning_user" />
+
+  </data>
+</odoo>
